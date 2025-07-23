@@ -7,65 +7,66 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #fff;
       margin: 0;
-      padding: 0;
+      background: #f8f9fa;
+      color: #333;
     }
     header {
+      background: #222;
+      color: white;
+      padding: 10px;
       display: flex;
       align-items: center;
-      background-color: #fff5e1;
-      padding: 10px 20px;
-      border-bottom: 2px solid #d8a35d;
+      gap: 10px;
     }
     header img {
-      height: 80px;
-      margin-right: 20px;
+      height: 50px;
     }
-    header h1 {
-      font-size: 24px;
-    }
-    .container {
-      padding: 20px;
-    }
-    .grid {
+    .contenedor {
       display: grid;
       grid-template-columns: repeat(10, 1fr);
-      gap: 8px;
+      gap: 10px;
+      padding: 20px;
+      overflow-x: auto;
+    }
+    .anio {
+      background: #dee2e6;
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .anio h3 {
       text-align: center;
+      margin: 0 0 10px;
     }
-    .semester-title {
-      font-weight: bold;
-      background-color: #f2d6b3;
+    .materia {
+      background: #ffffff;
+      border: 1px solid #ccc;
       padding: 6px;
-    }
-    .course {
-      background-color: #fff9ee;
-      border: 1px solid #d8a35d;
-      padding: 8px;
+      margin: 5px 0;
       border-radius: 6px;
-      min-height: 50px;
       cursor: pointer;
+      transition: background 0.3s;
       position: relative;
-      font-size: 13px;
     }
-    .course.locked {
-      background-color: #eee;
-      color: #aaa;
+    .materia:hover {
+      background: #e9ecef;
+    }
+    .materia.aprobada {
+      background: #c3e6cb;
+      color: #155724;
+    }
+    .materia.bloqueada {
+      background: #f8d7da;
+      color: #721c24;
       cursor: not-allowed;
     }
-    .course.completed {
-      background-color: #d8f5d0;
-      border-color: #5cb85c;
-    }
-    .tooltip {
+    .materia .tooltip {
       visibility: hidden;
-      width: 200px;
       background-color: #333;
       color: #fff;
       text-align: center;
       border-radius: 6px;
-      padding: 5px;
+      padding: 4px 8px;
       position: absolute;
       z-index: 1;
       bottom: 125%;
@@ -73,117 +74,130 @@
       transform: translateX(-50%);
       opacity: 0;
       transition: opacity 0.3s;
+      white-space: nowrap;
     }
-    .course:hover .tooltip {
+    .materia:hover .tooltip {
       visibility: visible;
       opacity: 1;
     }
-    .acciones {
-      margin-bottom: 15px;
+    #progreso-container {
+      margin: 15px;
     }
-    #progreso {
-      margin-bottom: 10px;
-      font-weight: bold;
-      color: #9d6b1f;
+    .barra-progreso {
+      height: 20px;
+      background: #e9ecef;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .barra-progreso span {
+      display: block;
+      height: 100%;
+      background: #28a745;
+      text-align: center;
+      color: white;
+    }
+    footer {
+      text-align: center;
+      padding: 10px;
+      font-size: 0.9em;
+      color: #666;
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="https://drive.google.com/uc?export=view&id=1zmdkjB_XNz5FhoAXCz8vBeoSpq8Vpbbl" alt="Logo CEIM">
-    <h1>Centro de Estudiantes de Ingeniería Civil en Minas</h1>
+    <img src="" + logo_data_url + "" alt="Logo CEIM">
+    <h1>Malla Curricular CEIM 2025</h1>
   </header>
-  <div class="container">
-    <div id="progreso"></div>
-    <div class="acciones">
-      <button onclick="exportarProgreso()">Exportar progreso</button>
-      <button onclick="window.print()">Generar PDF</button>
-      <button onclick="marcarTodo()">Marcar todo</button>
-      <button onclick="resetearProgreso()">Resetear progreso</button>
+
+  <div id="progreso-container">
+    <strong>Progreso:</strong> <span id="porcentaje">0%</span>
+    <div class="barra-progreso">
+      <span id="barra" style="width: 0%"></span>
     </div>
-    <div class="grid" id="malla"></div>
   </div>
+
+  <div class="contenedor" id="malla"></div>
+
+  <footer>Página creada por Rocío Gallardo, Presidenta CEIM 2025</footer>
+
   <script>
-    const cursos = {
-      "1": ["Introducción a las Matemáticas", "Física General", "Introducción a la Ingeniería", "Introducción a la Programación", "Habilidades Comunicativas"],
-      "2": ["Cálculo Diferencial", "Física Experimental", "Base de Datos", "Geología I", "Comunicación Oral y Escrita"],
-      "3": ["Cálculo Integral", "Álgebra Lineal", "Mecánica Clásica", "Química General", "Geología II"],
-      "4": ["Ecuaciones Diferenciales", "Termodinámica", "Mecánica de Fluidos", "Mineralogía", "Métodos Numéricos"],
-      "5": ["Mecánica de Rocas I", "Metalurgia Extractiva", "Topografía y Geomática", "Minería Subterránea", "Probabilidades y Estadística"],
-      "6": ["Mecánica de Rocas II", "Minería a Cielo Abierto", "Ventilación de Minas", "Geotecnia", "Simulación de Procesos"],
-      "7": ["Tronadura y Perforación", "Planificación Minera", "Transporte de Materiales", "Hidrología y Drenaje", "Gestión Ambiental"],
-      "8": ["Evaluación de Proyectos Mineros", "Seguridad y Salud Ocupacional", "Automatización y Control", "Economía de Minerales", "Taller de Integración"],
-      "9": ["Ética Profesional", "Innovación y Emprendimiento", "Electivo 1", "Electivo 2", "Electivo 3"],
-      "10": ["Trabajo de Título"]
+    const materias = {
+      '1': [
+        { id: 'matematicas', nombre: 'Introducción a las Matemáticas' },
+        { id: 'fisica', nombre: 'Física General' },
+        { id: 'ingenieria', nombre: 'Introducción a la Ingeniería' },
+        { id: 'programacion', nombre: 'Introducción a la Programación' }
+      ],
+      '2': [
+        { id: 'calculo', nombre: 'Cálculo Diferencial', req: ['matematicas'] },
+        { id: 'fisica_exp', nombre: 'Física Experimental', req: ['fisica', 'matematicas'] },
+        { id: 'habilidades', nombre: 'Habilidades Comunicativas' },
+        { id: 'basedatos', nombre: 'Base de Datos', req: ['programacion'] },
+        { id: 'geo1', nombre: 'Geología I' }
+      ],
+      '3': [
+        { id: 'mecanica', nombre: 'Mecánica', req: ['fisica_exp', 'calculo'] },
+        { id: 'calc_int', nombre: 'Cálculo Integral', req: ['calculo'] },
+        { id: 'compliance', nombre: 'Compliance & Accountability', req: ['ingenieria'] },
+        { id: 'quimica', nombre: 'Química y Ambiente' },
+        { id: 'geo2', nombre: 'Geología II', req: ['geo1'] }
+      ]
+      // ... puedes seguir agregando los otros años aquí ...
     };
 
-    const aprobadas = JSON.parse(localStorage.getItem("aprobadas") || "[]");
-
-    function crearMalla() {
-      const contenedor = document.getElementById("malla");
-      for (let i = 1; i <= 10; i++) {
-        const titulo = document.createElement("div");
-        titulo.className = "semester-title";
-        titulo.textContent = `Semestre ${i}`;
-        contenedor.appendChild(titulo);
-        cursos[i].forEach(curso => {
-          const div = document.createElement("div");
-          div.className = "course";
-          div.textContent = curso;
-          if (aprobadas.includes(curso)) div.classList.add("completed");
-          div.onclick = () => {
-            if (aprobadas.includes(curso)) {
-              aprobadas.splice(aprobadas.indexOf(curso), 1);
-            } else {
-              aprobadas.push(curso);
-            }
-            localStorage.setItem("aprobadas", JSON.stringify(aprobadas));
-            location.reload();
-          };
-          contenedor.appendChild(div);
-        });
-      }
-    }
-
-    function marcarTodo() {
-      const todas = [];
-      for (let i = 1; i <= 10; i++) cursos[i].forEach(c => todas.push(c));
-      localStorage.setItem("aprobadas", JSON.stringify(todas));
-      location.reload();
-    }
-
-    function resetearProgreso() {
-      localStorage.removeItem("aprobadas");
-      location.reload();
-    }
+    const estado = JSON.parse(localStorage.getItem('estadoMaterias') || '{}');
 
     function actualizarProgreso() {
-      let total = 0;
-      let completadas = 0;
-      for (let i = 1; i <= 10; i++) {
-        cursos[i].forEach(c => {
-          total++;
-          if (aprobadas.includes(c)) completadas++;
-        });
-      }
-      const porcentaje = Math.round((completadas / total) * 100);
-      document.getElementById("progreso").textContent = `Progreso: ${completadas} / ${total} cursos aprobados (${porcentaje}%)`;
+      const total = document.querySelectorAll('.materia').length;
+      const aprobadas = document.querySelectorAll('.materia.aprobada').length;
+      const porcentaje = Math.round((aprobadas / total) * 100);
+      document.getElementById('porcentaje').textContent = porcentaje + '%';
+      document.getElementById('barra').style.width = porcentaje + '%';
     }
 
-    function exportarProgreso() {
-      const data = JSON.stringify(aprobadas, null, 2);
-      const blob = new Blob([data], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'progreso_ceim.json';
-      a.click();
-      URL.revokeObjectURL(url);
+    function crearMalla() {
+      const contenedor = document.getElementById('malla');
+      for (let ciclo in materias) {
+        const columna = document.createElement('div');
+        columna.className = 'anio';
+        const titulo = document.createElement('h3');
+        titulo.textContent = 'Semestre ' + ciclo;
+        columna.appendChild(titulo);
+
+        materias[ciclo].forEach(m => {
+          const div = document.createElement('div');
+          div.className = 'materia';
+          div.textContent = estado[m.id] ? '✅ ' + m.nombre : m.nombre;
+          if (estado[m.id]) div.classList.add('aprobada');
+          if (m.req && !m.req.every(r => estado[r])) {
+            div.classList.add('bloqueada');
+            const tooltip = document.createElement('span');
+            tooltip.className = 'tooltip';
+            tooltip.textContent = 'Requiere: ' + m.req.map(r => materiasPorId[r]).join(', ');
+            div.appendChild(tooltip);
+          }
+
+          div.addEventListener('click', () => {
+            if (div.classList.contains('bloqueada')) return;
+            estado[m.id] = !estado[m.id];
+            localStorage.setItem('estadoMaterias', JSON.stringify(estado));
+            location.reload();
+          });
+
+          columna.appendChild(div);
+        });
+        contenedor.appendChild(columna);
+      }
+      actualizarProgreso();
+    }
+
+    const materiasPorId = {};
+    for (let ciclo in materias) {
+      materias[ciclo].forEach(m => materiasPorId[m.id] = m.nombre);
     }
 
     crearMalla();
-    actualizarProgreso();
   </script>
 </body>
 </html>
-
