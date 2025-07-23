@@ -33,6 +33,7 @@
       background: #dee2e6;
       border-radius: 8px;
       padding: 10px;
+      min-width: 180px;
     }
     .anio h3 {
       text-align: center;
@@ -95,6 +96,7 @@
       background: #28a745;
       text-align: center;
       color: white;
+      transition: width 0.5s;
     }
     footer {
       text-align: center;
@@ -106,7 +108,8 @@
 </head>
 <body>
   <header>
-    <img src="" + logo_data_url + "" alt="Logo CEIM">
+    <!-- Reemplaza el src de abajo con el link directo de tu logo. Ejemplo de link directo de Google Drive. -->
+    <img src="https://drive.google.com/uc?export=view&id=1zmdkjB_XNz5FhoAXCz8vBeoSpq8Vpbbl" alt="Logo CEIM">
     <h1>Malla Curricular CEIM 2025</h1>
   </header>
 
@@ -122,6 +125,7 @@
   <footer>Página creada por Rocío Gallardo, Presidenta CEIM 2025</footer>
 
   <script>
+    // Puedes agregar más materias y semestres según lo requieras.
     const materias = {
       '1': [
         { id: 'matematicas', nombre: 'Introducción a las Matemáticas' },
@@ -143,21 +147,30 @@
         { id: 'quimica', nombre: 'Química y Ambiente' },
         { id: 'geo2', nombre: 'Geología II', req: ['geo1'] }
       ]
-      // ... puedes seguir agregando los otros años aquí ...
+      // Puedes seguir agregando los otros años aquí...
     };
 
+    // Mapea IDs a nombres de materias para los requisitos en tooltips
+    const materiasPorId = {};
+    for (let ciclo in materias) {
+      materias[ciclo].forEach(m => materiasPorId[m.id] = m.nombre);
+    }
+
+    // Recupera estado de materias del localStorage
     const estado = JSON.parse(localStorage.getItem('estadoMaterias') || '{}');
 
     function actualizarProgreso() {
       const total = document.querySelectorAll('.materia').length;
       const aprobadas = document.querySelectorAll('.materia.aprobada').length;
-      const porcentaje = Math.round((aprobadas / total) * 100);
+      const porcentaje = total ? Math.round((aprobadas / total) * 100) : 0;
       document.getElementById('porcentaje').textContent = porcentaje + '%';
       document.getElementById('barra').style.width = porcentaje + '%';
     }
 
     function crearMalla() {
       const contenedor = document.getElementById('malla');
+      contenedor.innerHTML = ''; // Limpia antes de crear
+
       for (let ciclo in materias) {
         const columna = document.createElement('div');
         columna.className = 'anio';
@@ -169,7 +182,10 @@
           const div = document.createElement('div');
           div.className = 'materia';
           div.textContent = estado[m.id] ? '✅ ' + m.nombre : m.nombre;
+
           if (estado[m.id]) div.classList.add('aprobada');
+
+          // Bloquea si no cumple requisitos
           if (m.req && !m.req.every(r => estado[r])) {
             div.classList.add('bloqueada');
             const tooltip = document.createElement('span');
@@ -182,7 +198,7 @@
             if (div.classList.contains('bloqueada')) return;
             estado[m.id] = !estado[m.id];
             localStorage.setItem('estadoMaterias', JSON.stringify(estado));
-            location.reload();
+            crearMalla();
           });
 
           columna.appendChild(div);
@@ -190,11 +206,6 @@
         contenedor.appendChild(columna);
       }
       actualizarProgreso();
-    }
-
-    const materiasPorId = {};
-    for (let ciclo in materias) {
-      materias[ciclo].forEach(m => materiasPorId[m.id] = m.nombre);
     }
 
     crearMalla();
