@@ -3,88 +3,173 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Malla CEIM 2025</title>
+  <title>Malla Curricular CEIM 2025</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f1f4f9;
-      padding: 20px;
-      color: #102a43;
+      background-color: #f4f1ec;
+      color: #2e2e2e;
       margin: 0;
+      padding: 0;
     }
-    h1 {
-      text-align: center;
-      color: #0b2545;
+    header {
+      display: flex;
+      align-items: center;
+      background-color: #fff5e1;
+      padding: 10px 20px;
+      border-bottom: 2px solid #d8a35d;
     }
-    .logo {
-      text-align: center;
-      margin-bottom: 20px;
+    header img {
+      height: 80px;
+      margin-right: 20px;
     }
-    .logo img {
-      max-height: 100px;
+    header h1 {
+      font-size: 24px;
     }
-    .malla {
-      display: grid;
-      grid-template-columns: repeat(10, minmax(180px, 1fr));
+    .container {
+      padding: 20px;
+    }
+    .year {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 30px;
+    }
+    .year-title {
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #9d6b1f;
+    }
+    .semester {
+      display: flex;
       gap: 10px;
-      overflow-x: auto;
+      flex-wrap: wrap;
     }
-    .semestre {
-      background: #dce5f2;
-      border-radius: 10px;
-      padding: 10px;
-    }
-    .semestre h3 {
-      text-align: center;
-      color: #0b3c5d;
-    }
-    .asignatura {
-      background: #ffffff;
-      border: 1px solid #8faac8;
+    .course {
+      background-color: #fff9ee;
+      border: 1px solid #d8a35d;
+      padding: 8px;
       border-radius: 6px;
-      margin: 5px 0;
-      padding: 6px 10px;
       cursor: pointer;
       position: relative;
-      user-select: none;
-      color: #102a43;
+      min-width: 150px;
+      text-align: center;
     }
-    .asignatura.aprobada {
-      background: #d2f0db;
-      text-decoration: line-through;
-      border-color: #82c49b;
-      color: #1b4d3e;
-    }
-    .asignatura.bloqueada {
-      background: #f0f0f0;
+    .course.locked {
+      background-color: #f0f0f0;
+      color: #aaa;
       cursor: not-allowed;
-      color: #a0a0a0;
-      border-color: #cccccc;
     }
-    .asignatura:hover::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      bottom: 100%;
-      left: 0;
-      background: #0b3c5d;
+    .course.completed {
+      background-color: #d8f5d0;
+      border-color: #5cb85c;
+    }
+    .tooltip {
+      visibility: hidden;
+      width: 200px;
+      background-color: #333;
       color: #fff;
+      text-align: center;
+      border-radius: 6px;
       padding: 5px;
-      border-radius: 5px;
-      white-space: nowrap;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .course:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
       font-size: 12px;
-      display: block;
-      z-index: 100;
+      background-color: #fff5e1;
+      border-top: 1px solid #d8a35d;
+      color: #555;
     }
   </style>
 </head>
 <body>
-  <div class="logo">
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXAAAADICAMAAAC3SZt3AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAxQTFRF////AAAA////////////////////rjGc6gAAABx0Uk5T//////////////////////////////////////////////////////////////////////////ALWZ90kAAAYoSURBVHja7N1BbuMwDAXQuWz///a1m8iAlNYMN8prchG4zcDiTF+n39/v6TvhUsvjliOBZDLsAANwsEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEgoFnBsm/gFwDZm4AA3JMG7EJncAxA7MZydSSZ9AWJv3UzAFUthYcClC63FYyoHV2EpRZ3oc3x0rPcwC9l1XmbVgsurhYkOgVDNcFK/feyNSaT98epG2iUM3DrWc8C4ljz42ZVbVaLdeiwADZzCeFZWjV16CVAYy2pobI6Vlr3oelNBaM10O1WsDkuq6AjKcNwI3t5X0V3wAz66bqH3y8pAPlcOT4aOxE19Ud0c74gEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEAoEgk+g/wBjMzTjyZoz7QAAAABJRU5ErkJggg==" alt="Logo CEIM">
-  </div>
-  <h1>Malla Curricular Interactiva - Ingeniería Civil en Minas 2025</h1>
-  <div class="malla" id="malla"></div>
+  <header>
+    <img src="Monochrome Minimalist Graphic Designer Email Signature.png" alt="Logo CEIM" />
+    <h1>Centro de Estudiantes de Ingeniería Civil en Minas</h1>
+  </header>
+  <div class="container" id="malla"></div>
+  <footer>
+    Hecha por Rocío Gallardo CEIM 2025
+  </footer>
+  <script>
+    const cursos = {
+      "1": [
+        { nombre: "Introducción a las Matemáticas" },
+        { nombre: "Física General" },
+        { nombre: "Introducción a la Ingeniería" },
+        { nombre: "Introducción a la Programación" },
+        { nombre: "Habilidades Comunicativas" }
+      ],
+      "2": [
+        { nombre: "Cálculo Diferencial", requisitos: ["Introducción a las Matemáticas"] },
+        { nombre: "Física Experimental", requisitos: ["Física General"] },
+        { nombre: "Base de Datos", requisitos: ["Introducción a la Programación"] },
+        { nombre: "Geología I" },
+        { nombre: "Habilidades Comunicativas" }
+      ]
+      // Agregar más semestres aquí
+    };
 
-  <!-- el resto del código permanece sin cambios -->
-<p style="text-align: center; font-size: 12px; color: #607080; margin-top: 40px;">Página hecha por Rocío Gallardo, Presidenta CEIM 2025</p>
+    const aprobadas = JSON.parse(localStorage.getItem("aprobadas") || "[]");
+
+    function crearMalla() {
+      const container = document.getElementById("malla");
+      for (let semestre in cursos) {
+        const yearDiv = document.createElement("div");
+        yearDiv.className = "year";
+        yearDiv.innerHTML = `<div class="year-title">Semestre ${semestre}</div>`;
+
+        const semDiv = document.createElement("div");
+        semDiv.className = "semester";
+
+        cursos[semestre].forEach((c) => {
+          const div = document.createElement("div");
+          div.className = "course";
+          div.textContent = c.nombre;
+
+          const requisitos = c.requisitos || [];
+          const bloqueado = requisitos.some(r => !aprobadas.includes(r));
+
+          if (bloqueado) {
+            div.classList.add("locked");
+            const tooltip = document.createElement("div");
+            tooltip.className = "tooltip";
+            tooltip.textContent = `Requiere: ${requisitos.join(", ")}`;
+            div.appendChild(tooltip);
+          } else {
+            if (aprobadas.includes(c.nombre)) div.classList.add("completed");
+            div.addEventListener("click", () => {
+              if (aprobadas.includes(c.nombre)) {
+                const i = aprobadas.indexOf(c.nombre);
+                aprobadas.splice(i, 1);
+              } else {
+                aprobadas.push(c.nombre);
+              }
+              localStorage.setItem("aprobadas", JSON.stringify(aprobadas));
+              location.reload();
+            });
+          }
+
+          semDiv.appendChild(div);
+        });
+        yearDiv.appendChild(semDiv);
+        container.appendChild(yearDiv);
+      }
+    }
+
+    crearMalla();
+  </script>
 </body>
 </html>
