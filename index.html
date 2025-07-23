@@ -7,8 +7,7 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f1ec;
-      color: #2e2e2e;
+      background-color: #fff;
       margin: 0;
       padding: 0;
     }
@@ -29,34 +28,29 @@
     .container {
       padding: 20px;
     }
-    .year {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 30px;
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 8px;
+      text-align: center;
     }
-    .year-title {
+    .semester-title {
       font-weight: bold;
-      font-size: 18px;
-      margin-bottom: 10px;
-      color: #9d6b1f;
-    }
-    .semester {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+      background-color: #f2d6b3;
+      padding: 6px;
     }
     .course {
       background-color: #fff9ee;
       border: 1px solid #d8a35d;
       padding: 8px;
       border-radius: 6px;
+      min-height: 50px;
       cursor: pointer;
       position: relative;
-      min-width: 150px;
-      text-align: center;
+      font-size: 13px;
     }
     .course.locked {
-      background-color: #f0f0f0;
+      background-color: #eee;
       color: #aaa;
       cursor: not-allowed;
     }
@@ -84,6 +78,14 @@
       visibility: visible;
       opacity: 1;
     }
+    .acciones {
+      margin-bottom: 15px;
+    }
+    #progreso {
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: #9d6b1f;
+    }
   </style>
 </head>
 <body>
@@ -92,92 +94,60 @@
     <h1>Centro de Estudiantes de Ingeniería Civil en Minas</h1>
   </header>
   <div class="container">
-    <div id="progreso" style="margin-bottom: 10px; font-weight: bold; color: #9d6b1f;"></div>
-    <div style="margin-bottom: 15px;">
+    <div id="progreso"></div>
+    <div class="acciones">
       <button onclick="exportarProgreso()">Exportar progreso</button>
-      <button onclick="window.print()">Generar PDF</button><br><br>
+      <button onclick="window.print()">Generar PDF</button>
       <button onclick="marcarTodo()">Marcar todo</button>
       <button onclick="resetearProgreso()">Resetear progreso</button>
     </div>
-    <div id="malla"></div>
+    <div class="grid" id="malla"></div>
   </div>
-
   <script>
     const cursos = {
-      "1": [
-        { nombre: "Introducción a las Matemáticas" },
-        { nombre: "Física General" },
-        { nombre: "Introducción a la Ingeniería" },
-        { nombre: "Introducción a la Programación" },
-        { nombre: "Habilidades Comunicativas" }
-      ],
-      "2": [
-        { nombre: "Cálculo Diferencial", requisitos: ["Introducción a las Matemáticas"] },
-        { nombre: "Física Experimental", requisitos: ["Física General", "Introducción a las Matemáticas"] },
-        { nombre: "Base de Datos", requisitos: ["Introducción a la Programación"] },
-        { nombre: "Geología I" },
-        { nombre: "Habilidades Comunicativas" }
-      ]
-      // Puedes continuar añadiendo los semestres 3 al 10 aquí igual que antes
+      "1": ["Introducción a las Matemáticas", "Física General", "Introducción a la Ingeniería", "Introducción a la Programación", "Habilidades Comunicativas"],
+      "2": ["Cálculo Diferencial", "Física Experimental", "Base de Datos", "Geología I", "Comunicación Oral y Escrita"],
+      "3": ["Cálculo Integral", "Álgebra Lineal", "Mecánica Clásica", "Química General", "Geología II"],
+      "4": ["Ecuaciones Diferenciales", "Termodinámica", "Mecánica de Fluidos", "Mineralogía", "Métodos Numéricos"],
+      "5": ["Mecánica de Rocas I", "Metalurgia Extractiva", "Topografía y Geomática", "Minería Subterránea", "Probabilidades y Estadística"],
+      "6": ["Mecánica de Rocas II", "Minería a Cielo Abierto", "Ventilación de Minas", "Geotecnia", "Simulación de Procesos"],
+      "7": ["Tronadura y Perforación", "Planificación Minera", "Transporte de Materiales", "Hidrología y Drenaje", "Gestión Ambiental"],
+      "8": ["Evaluación de Proyectos Mineros", "Seguridad y Salud Ocupacional", "Automatización y Control", "Economía de Minerales", "Taller de Integración"],
+      "9": ["Ética Profesional", "Innovación y Emprendimiento", "Electivo 1", "Electivo 2", "Electivo 3"],
+      "10": ["Trabajo de Título"]
     };
 
     const aprobadas = JSON.parse(localStorage.getItem("aprobadas") || "[]");
 
     function crearMalla() {
-      const container = document.getElementById("malla");
-      for (let semestre in cursos) {
-        const yearDiv = document.createElement("div");
-        yearDiv.className = "year";
-        yearDiv.innerHTML = `<div class="year-title">Semestre ${semestre}</div>`;
-
-        const semDiv = document.createElement("div");
-        semDiv.className = "semester";
-
-        cursos[semestre].forEach((c) => {
+      const contenedor = document.getElementById("malla");
+      for (let i = 1; i <= 10; i++) {
+        const titulo = document.createElement("div");
+        titulo.className = "semester-title";
+        titulo.textContent = `Semestre ${i}`;
+        contenedor.appendChild(titulo);
+        cursos[i].forEach(curso => {
           const div = document.createElement("div");
           div.className = "course";
-          div.textContent = c.nombre;
-
-          const requisitos = c.requisitos || [];
-          const corequisitos = c.corequisitos || [];
-          const noCumpleRequisitos = requisitos.some(r => !aprobadas.includes(r));
-          const noCumpleCorequisitos = corequisitos.some(r => !aprobadas.includes(r));
-          const bloqueado = noCumpleRequisitos;
-
-          if (bloqueado) {
-            div.classList.add("locked");
-            const tooltip = document.createElement("div");
-            tooltip.className = "tooltip";
-            let msg = [];
-            if (noCumpleRequisitos) msg.push(`Requiere: ${requisitos.filter(r => !aprobadas.includes(r)).join(", ")}`);
-            if (noCumpleCorequisitos) msg.push(`Corequiere: ${corequisitos.filter(r => !aprobadas.includes(r)).join(", ")}`);
-            tooltip.textContent = msg.join(" | ");
-            div.appendChild(tooltip);
-          } else {
-            if (aprobadas.includes(c.nombre)) div.classList.add("completed");
-            div.addEventListener("click", () => {
-              if (aprobadas.includes(c.nombre)) {
-                aprobadas.splice(aprobadas.indexOf(c.nombre), 1);
-              } else {
-                aprobadas.push(c.nombre);
-              }
-              localStorage.setItem("aprobadas", JSON.stringify(aprobadas));
-              location.reload();
-            });
-          }
-
-          semDiv.appendChild(div);
+          div.textContent = curso;
+          if (aprobadas.includes(curso)) div.classList.add("completed");
+          div.onclick = () => {
+            if (aprobadas.includes(curso)) {
+              aprobadas.splice(aprobadas.indexOf(curso), 1);
+            } else {
+              aprobadas.push(curso);
+            }
+            localStorage.setItem("aprobadas", JSON.stringify(aprobadas));
+            location.reload();
+          };
+          contenedor.appendChild(div);
         });
-        yearDiv.appendChild(semDiv);
-        container.appendChild(yearDiv);
       }
     }
 
     function marcarTodo() {
       const todas = [];
-      for (let semestre in cursos) {
-        cursos[semestre].forEach(c => todas.push(c.nombre));
-      }
+      for (let i = 1; i <= 10; i++) cursos[i].forEach(c => todas.push(c));
       localStorage.setItem("aprobadas", JSON.stringify(todas));
       location.reload();
     }
@@ -190,10 +160,10 @@
     function actualizarProgreso() {
       let total = 0;
       let completadas = 0;
-      for (let semestre in cursos) {
-        cursos[semestre].forEach(c => {
+      for (let i = 1; i <= 10; i++) {
+        cursos[i].forEach(c => {
           total++;
-          if (aprobadas.includes(c.nombre)) completadas++;
+          if (aprobadas.includes(c)) completadas++;
         });
       }
       const porcentaje = Math.round((completadas / total) * 100);
@@ -216,3 +186,4 @@
   </script>
 </body>
 </html>
+
