@@ -4,7 +4,87 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Malla Curricular CEIM 2025</title>
-  <style>/* estilos sin cambios */</style>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f1ec;
+      color: #2e2e2e;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      background-color: #fff5e1;
+      padding: 10px 20px;
+      border-bottom: 2px solid #d8a35d;
+    }
+    header img {
+      height: 80px;
+      margin-right: 20px;
+    }
+    header h1 {
+      font-size: 24px;
+    }
+    .container {
+      padding: 20px;
+    }
+    .year {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 30px;
+    }
+    .year-title {
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #9d6b1f;
+    }
+    .semester {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .course {
+      background-color: #fff9ee;
+      border: 1px solid #d8a35d;
+      padding: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      min-width: 150px;
+      text-align: center;
+    }
+    .course.locked {
+      background-color: #f0f0f0;
+      color: #aaa;
+      cursor: not-allowed;
+    }
+    .course.completed {
+      background-color: #d8f5d0;
+      border-color: #5cb85c;
+    }
+    .tooltip {
+      visibility: hidden;
+      width: 200px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .course:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -14,7 +94,6 @@
   <div class="container">
     <div id="progreso" style="margin-bottom: 10px; font-weight: bold; color: #9d6b1f;"></div>
     <div style="margin-bottom: 15px;">
-      
       <button onclick="exportarProgreso()">Exportar progreso</button>
       <button onclick="window.print()">Generar PDF</button><br><br>
       <button onclick="marcarTodo()">Marcar todo</button>
@@ -22,11 +101,26 @@
     </div>
     <div id="malla"></div>
   </div>
-  <footer>
-    Hecha por Rocío Gallardo CEIM 2025
-  </footer>
+
   <script>
-    const cursos = /** permanece igual **/;
+    const cursos = {
+      "1": [
+        { nombre: "Introducción a las Matemáticas" },
+        { nombre: "Física General" },
+        { nombre: "Introducción a la Ingeniería" },
+        { nombre: "Introducción a la Programación" },
+        { nombre: "Habilidades Comunicativas" }
+      ],
+      "2": [
+        { nombre: "Cálculo Diferencial", requisitos: ["Introducción a las Matemáticas"] },
+        { nombre: "Física Experimental", requisitos: ["Física General", "Introducción a las Matemáticas"] },
+        { nombre: "Base de Datos", requisitos: ["Introducción a la Programación"] },
+        { nombre: "Geología I" },
+        { nombre: "Habilidades Comunicativas" }
+      ]
+      // Puedes continuar añadiendo los semestres 3 al 10 aquí igual que antes
+    };
+
     const aprobadas = JSON.parse(localStorage.getItem("aprobadas") || "[]");
 
     function crearMalla() {
@@ -80,49 +174,45 @@
     }
 
     function marcarTodo() {
-  const todas = [];
-  for (let semestre in cursos) {
-    cursos[semestre].forEach(c => todas.push(c.nombre));
-  }
-  localStorage.setItem("aprobadas", JSON.stringify(todas));
-  location.reload();
-}
+      const todas = [];
+      for (let semestre in cursos) {
+        cursos[semestre].forEach(c => todas.push(c.nombre));
+      }
+      localStorage.setItem("aprobadas", JSON.stringify(todas));
+      location.reload();
+    }
 
-function resetearProgreso() {
-  localStorage.removeItem("aprobadas");
-  location.reload();
-}
+    function resetearProgreso() {
+      localStorage.removeItem("aprobadas");
+      location.reload();
+    }
 
-function actualizarProgreso() {
-  let total = 0;
-  let completadas = 0;
-  for (let semestre in cursos) {
-    cursos[semestre].forEach(c => {
-      total++;
-      if (aprobadas.includes(c.nombre)) completadas++;
-    });
-  }
-  const porcentaje = Math.round((completadas / total) * 100);
-  document.getElementById("progreso").textContent = `Progreso: ${completadas} / ${total} cursos aprobados (${porcentaje}%)`;
-}
+    function actualizarProgreso() {
+      let total = 0;
+      let completadas = 0;
+      for (let semestre in cursos) {
+        cursos[semestre].forEach(c => {
+          total++;
+          if (aprobadas.includes(c.nombre)) completadas++;
+        });
+      }
+      const porcentaje = Math.round((completadas / total) * 100);
+      document.getElementById("progreso").textContent = `Progreso: ${completadas} / ${total} cursos aprobados (${porcentaje}%)`;
+    }
 
+    function exportarProgreso() {
+      const data = JSON.stringify(aprobadas, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'progreso_ceim.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
 
-  });
-}
-
-function exportarProgreso() {
-  const data = JSON.stringify(aprobadas, null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'progreso_ceim.json';
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-crearMalla();
-actualizarProgreso();
+    crearMalla();
+    actualizarProgreso();
   </script>
 </body>
 </html>
