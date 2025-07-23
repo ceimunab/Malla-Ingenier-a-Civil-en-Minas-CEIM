@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Malla Curricular CEIM 2025</title>
   <style>
     body {
@@ -96,7 +96,7 @@
 </head>
 <body>
   <header>
-    <img src="Monochrome Minimalist Graphic Designer Email Signature.png" alt="Logo CEIM" />
+    <img src="Monochrome Minimalist Graphic Designer Email Signature.png" alt="Logo CEIM">
     <h1>Centro de Estudiantes de Ingeniería Civil en Minas</h1>
   </header>
   <div class="container" id="malla"></div>
@@ -114,12 +114,67 @@
       ],
       "2": [
         { nombre: "Cálculo Diferencial", requisitos: ["Introducción a las Matemáticas"] },
-        { nombre: "Física Experimental", requisitos: ["Física General"] },
+        { nombre: "Física Experimental", requisitos: ["Física General", "Introducción a las Matemáticas"] },
         { nombre: "Base de Datos", requisitos: ["Introducción a la Programación"] },
         { nombre: "Geología I" },
         { nombre: "Habilidades Comunicativas" }
+      ],
+      "3": [
+        { nombre: "Mecánica", requisitos: ["Cálculo Diferencial", "Física Experimental"] },
+        { nombre: "Cálculo Integral", requisitos: ["Cálculo Diferencial"] },
+        { nombre: "Compliance & Accountability", requisitos: ["Introducción a la Ingeniería"] },
+        { nombre: "Química y Ambiente" },
+        { nombre: "Geología II", requisitos: ["Geología I"] }
+      ],
+      "4": [
+        { nombre: "Minería y Energía para Rajo Abierto y Subterránea", requisitos: ["Mecánica", "Cálculo Integral"] },
+        { nombre: "Métodos Cuantitativos", requisitos: ["Cálculo Integral"] },
+        { nombre: "Inglés I" },
+        { nombre: "Integrador I: Práctica I", requisitos: ["Mecánica", "Cálculo Integral", "Compliance & Accountability", "Química y Ambiente", "Geología II"] },
+        { nombre: "Evaluación de Yacimientos", requisitos: ["Geología II"] }
+      ],
+      "5": [
+        { nombre: "Sistemas y Ecuaciones Diferenciales Lineales", requisitos: ["Cálculo Integral"] },
+        { nombre: "Inglés II", requisitos: ["Inglés I"] },
+        { nombre: "Mecánica de Rocas", requisitos: ["Geología II", "Mecánica"] },
+        { nombre: "Conminución", requisitos: ["Geología II"], corequisitos: ["Operaciones Unitarias I: Perforación y Tronaduras"] },
+        { nombre: "Operaciones Unitarias I: Perforación y Tronaduras", requisitos: ["Evaluación de Yacimientos"] }
+      ],
+      "6": [
+        { nombre: "Minería de Datos", requisitos: ["Métodos Cuantitativos", "Base de Datos"] },
+        { nombre: "Inglés III", requisitos: ["Inglés II"] },
+        { nombre: "Taller de Innovación y Emprendimiento I", requisitos: ["Introducción a la Ingeniería"] },
+        { nombre: "Concentración de Minerales", requisitos: ["Conminución"] },
+        { nombre: "Operaciones Unitarias II: Carguío y Transporte", requisitos: ["Operaciones Unitarias I: Perforación y Tronaduras"] }
+      ],
+      "7": [
+        { nombre: "Gestión de la Transformación Digital", requisitos: ["Compliance & Accountability"] },
+        { nombre: "Inglés IV", requisitos: ["Inglés III"] },
+        { nombre: "Taller de Innovación y Emprendimiento II", requisitos: ["Taller de Innovación y Emprendimiento I"] },
+        { nombre: "Pirometalurgia", requisitos: ["Concentración de Minerales"] },
+        { nombre: "Métodos de Explotación y Diseño Minero", requisitos: ["Operaciones Unitarias II: Carguío y Transporte"] }
+      ],
+      "8": [
+        { nombre: "Responsabilidad Social" },
+        { nombre: "Integrador II: Seminario de Licenciatura en Ciencias de la Ingeniería", requisitos: ["Pirometalurgia", "Métodos de Explotación y Diseño Minero"] },
+        { nombre: "Taller de Innovación y Emprendimiento III", requisitos: ["Taller de Innovación y Emprendimiento II"] },
+        { nombre: "Hidrometalurgia", requisitos: ["Concentración de Minerales"] },
+        { nombre: "Planificación Minera", requisitos: ["Métodos de Explotación y Diseño Minero"] }
+      ],
+      "9": [
+        { nombre: "Ventilación", requisitos: ["Métodos de Explotación y Diseño Minero"] },
+        { nombre: "Portafolio de Proyectos", requisitos: ["Métodos de Explotación y Diseño Minero", "Hidrometalurgia"] },
+        { nombre: "Economía, Dirección y Comercialización", requisitos: ["Métodos de Explotación y Diseño Minero"] },
+        { nombre: "Práctica II", requisitos: ["Integrador I: Práctica I"] },
+        { nombre: "Medio Ambiente y Legislación Minera", requisitos: ["Operaciones Unitarias II: Carguío y Transporte", "Hidrometalurgia"] }
+      ],
+      "10": [
+        { nombre: "Tópico de Especialidad I", requisitos: ["Planificación Minera", "Gestión de la Transformación Digital"] },
+        { nombre: "Tópico de Especialidad II", requisitos: ["Medio Ambiente y Legislación Minera"] },
+        { nombre: "Integrador III: Proyecto de Título", requisitos: ["Portafolio de Proyectos"] },
+        { nombre: "Tópico de Especialidad III", requisitos: ["Economía, Dirección y Comercialización", "Medio Ambiente y Legislación Minera"] },
+        { nombre: "Seguridad y Salud Ocupacional", requisitos: ["Medio Ambiente y Legislación Minera"] }
       ]
-      // Agregar más semestres aquí
     };
 
     const aprobadas = JSON.parse(localStorage.getItem("aprobadas") || "[]");
@@ -140,6 +195,7 @@
           div.textContent = c.nombre;
 
           const requisitos = c.requisitos || [];
+          const corequisitos = c.corequisitos || [];
           const bloqueado = requisitos.some(r => !aprobadas.includes(r));
 
           if (bloqueado) {
