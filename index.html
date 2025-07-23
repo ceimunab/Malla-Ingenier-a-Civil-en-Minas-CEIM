@@ -14,7 +14,7 @@
   <div class="container">
     <div id="progreso" style="margin-bottom: 10px; font-weight: bold; color: #9d6b1f;"></div>
     <div style="margin-bottom: 15px;">
-      <input type="text" id="busqueda" placeholder="Buscar curso..." oninput="buscarCurso()" style="padding: 5px; width: 200px;">
+      
       <button onclick="exportarProgreso()">Exportar progreso</button>
       <button onclick="window.print()">Generar PDF</button><br><br>
       <button onclick="marcarTodo()">Marcar todo</button>
@@ -106,13 +106,7 @@ function actualizarProgreso() {
   document.getElementById("progreso").textContent = `Progreso: ${completadas} / ${total} cursos aprobados (${porcentaje}%)`;
 }
 
-function buscarCurso() {
-  const query = document.getElementById("busqueda").value.toLowerCase();
-  document.querySelectorAll(".course").forEach(div => {
-    div.style.outline = "none";
-    if (query && div.textContent.toLowerCase().includes(query)) {
-      div.style.outline = "2px solid #9d6b1f";
-    }
+
   });
 }
 
